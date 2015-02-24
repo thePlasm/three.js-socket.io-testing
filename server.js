@@ -63,6 +63,9 @@ io.on('connection', function(socket){
 		map.voxels.push(obj);
 		socket.broadcast.emit('blockcreate', obj);
 	});
+	socket.on('chat', function(msg){
+		io.emit('chat', msg);
+	});
 	socket.on('blockdestroy', function(obj){
 		socket.broadcast.emit('blockdestroy', obj);
 		for (e = 0; e < map.voxels.length; e++) {

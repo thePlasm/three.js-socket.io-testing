@@ -9,3 +9,22 @@ body {
 canvas {
 	margin:0px;
 }
+#m {
+	position: absolute;
+	left: 0px;
+	bottom: 0px;
+	z-index: 10;
+	width: 100px;
+	height: 1em;
+}
+#messages {
+	position: absolute;
+	left: 0px;
+	bottom: 1em;
+	z-index: 10;
+	width: 100px;
+	background-color: rgba(0, 0, 0, 0.5);
+	color: #fff;
+	word-wrap: "break-word";
+	text-align: left;
+}

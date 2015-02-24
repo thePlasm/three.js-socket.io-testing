@@ -2,6 +2,8 @@ var socket = io();
 var myId = 0;
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+var listener = new THREE.AudioListener();
+camera.add( listener );
 camera.rotation.order = "YXZ";
 var renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -21,6 +23,7 @@ var players = [];
 var playerMeshes = [];
 var voxels = [];
 var voxelMeshes = [];
+var voxelSounds = [];
 socket.on('youJoin', function(obj){
 	camera.position.set(obj.x, obj.y, obj.z);
 	camera.rotation.set(obj.rotx, obj.roty, obj.rotz);
@@ -40,6 +43,10 @@ socket.on('youJoin', function(obj){
 		voxelMeshes.push(new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial( {color: voxels[d].colour} )));
 		voxelMeshes[voxelMeshes.length-1].position.set(voxels[d].x, voxels[d].y, voxels[d].z);
 		voxelMeshes[voxelMeshes.length-1].rotation.set(voxels[d].rotx, voxels[d].roty, voxels[d].rotz);
+		voxelSounds.push(new THREE.Audio(listener));
+		voxelSounds[voxelSounds.length-1].load('media/Frozen Star.mp3');
+		voxelSounds[voxelSounds.length-1].setRefDistance(20);
+		voxelMeshes[voxelMeshes.length-1].add(voxelSounds[voxelSounds.length-1]);
 		scene.add(voxelMeshes[voxelMeshes.length-1]);
 	}
 });
@@ -52,6 +59,9 @@ socket.on('playerJoin', function(id){
 		playerMeshes.push(new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), new THREE.MeshBasicMaterial( {color: 0xffffff} )));
 		scene.add(playerMeshes[playerMeshes.length-1]);
 	}
+});
+socket.on('chat', function(msg){
+	document.getElementById('messages').innerHTML += '<li>' + msg + '</li>';
 });
 socket.on('playerPos', function(obj){
 	for (i = 0; i<players.length; i++) {
@@ -80,12 +90,18 @@ socket.on('blockcreate', function(obj){
 	voxelMeshes.push(new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial( {color: obj.colour} )));
 	voxelMeshes[voxelMeshes.length-1].position.set(obj.x, obj.y, obj.z);
 	voxelMeshes[voxelMeshes.length-1].rotation.set(obj.rotx, obj.roty, obj.rotz);
+	voxelSounds.push(new THREE.Audio(listener));
+	voxelSounds[voxelSounds.length-1].load('media/Frozen Star.mp3');
+	voxelSounds[voxelSounds.length-1].setRefDistance(20);
+	voxelMeshes[voxelMeshes.length-1].add(voxelSounds[voxelSounds.length-1]);
 	scene.add(voxelMeshes[voxelMeshes.length-1]);
 });
 socket.on('blockdestroy', function(obj){
 	for (e = 0; e < voxels.length; e++) {
 		if (voxels[e].id == obj) {
 			scene.remove(voxelMeshes[e]);
+			voxelMeshes[e].remove(voxelSounds[e]);
+			voxelSounds.splice(e, 1);
 			voxels.splice(e, 1);
 			voxelMeshes.splice(e, 1);
 		}
@@ -226,6 +242,8 @@ _pressed: {},
     S: 83,
     SPACE: 32,
     SHIFT: 16,
+	ENTER: 13,
+	T: 84,
     
     isDown: function(keyCode) {
 return this._pressed[keyCode];
@@ -303,6 +321,8 @@ var render = function () {
 			if (bulletModes[counter] == "destroy") {
 				voxcolbulltempnum = findCol(bullets[counter].position.x - (5 * Math.sin(bullets[counter].rotation.y))/fps, bullets[counter].position.y + (5 * Math.tan(bullets[counter].rotation.x))/fps, bullets[counter].position.z - (5 * Math.cos(bullets[counter].rotation.y))/fps);
 				scene.remove(voxelMeshes[voxcolbulltempnum]);
+				voxelMeshes[voxcolbulltempnum].remove(voxelSounds[voxcolbulltempnum]);
+				voxelSounds.splice(voxcolbulltempnum, 1);
 				voxelMeshes.splice(voxcolbulltempnum, 1);
 				socket.emit('blockdestroy', voxels[voxcolbulltempnum].id);
 				voxels.splice(voxcolbulltempnum, 1);
@@ -314,6 +334,10 @@ var render = function () {
 			if (bulletModes[counter] == "create") {
 				voxelMeshes.push(new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial( {color: 0xffffff} )));
 				voxels.push({x: Math.round(bullets[counter].position.x), y: Math.round(bullets[counter].position.y), z: Math.round(bullets[counter].position.z), rotx: 0, roty: 0, rotz: 0, id: voxels.length, colour: 0xffffff});
+				voxelSounds.push(new THREE.Audio(listener));
+				voxelSounds[voxelSounds.length-1].load('media/Frozen Star.mp3');
+				voxelSounds[voxelSounds.length-1].setRefDistance(20);
+				voxelMeshes[voxelMeshes.length-1].add(voxelSounds[voxelSounds.length-1]);
 				scene.add(voxelMeshes[voxels.length-1]);
 				voxelMeshes[voxels.length-1].position.set(Math.round(bullets[counter].position.x), Math.round(bullets[counter].position.y), Math.round(bullets[counter].position.z));
 				scene.remove(bullets[counter]);
@@ -369,59 +393,74 @@ var render = function () {
 			}
 		}
 	}
-	if (Key.isDown(Key.ONE)) {
-		mode = 'create';
-	}
-	if (Key.isDown(Key.TWO)) {
-		mode = 'destroy';
-	}
-	if (Key.isDown(Key.THREE)) {
-		mode = 'red';
-	}
-	if (Key.isDown(Key.FOUR)) {
-		mode = 'green';
-	}
-	if (Key.isDown(Key.FIVE)) {
-		mode = 'blue';
-	}
-	if (Key.isDown(Key.SIX)) {
-		mode = 'white';
-	}
-	if (Key.isDown(Key.SEVEN)) {
-		mode = 'black';
-	}
-	if (Key.isDown(Key.W)) {
-		if (testCol(camera.position.x - 2 * (Math.sin(camera.rotation.y) / fps), camera.position.y, camera.position.z - 2 * (Math.cos(camera.rotation.y) / fps)) && testCol(camera.position.x - 2 * (Math.sin(camera.rotation.y) / fps), camera.position.y, camera.position.z - 2 * (Math.cos(camera.rotation.y) / fps))) {
-			camera.position.x -= 2 * Math.sin(camera.rotation.y) / fps;
-			camera.position.z -= 2 * Math.cos(camera.rotation.y) / fps;
+	if (!inChat) {
+		if (Key.isDown(Key.ONE)) {
+			mode = 'create';
+		}
+		if (Key.isDown(Key.TWO)) {
+			mode = 'destroy';
+		}
+		if (Key.isDown(Key.THREE)) {
+			mode = 'red';
+		}
+		if (Key.isDown(Key.FOUR)) {
+			mode = 'green';
+		}
+		if (Key.isDown(Key.FIVE)) {
+			mode = 'blue';
+		}
+		if (Key.isDown(Key.SIX)) {
+			mode = 'white';
+		}
+		if (Key.isDown(Key.SEVEN)) {
+			mode = 'black';
+		}
+		if (Key.isDown(Key.W)) {
+			if (testCol(camera.position.x - 2 * (Math.sin(camera.rotation.y) / fps), camera.position.y, camera.position.z - 2 * (Math.cos(camera.rotation.y) / fps)) && testCol(camera.position.x - 2 * (Math.sin(camera.rotation.y) / fps), camera.position.y, camera.position.z - 2 * (Math.cos(camera.rotation.y) / fps))) {
+				camera.position.x -= 2 * Math.sin(camera.rotation.y) / fps;
+				camera.position.z -= 2 * Math.cos(camera.rotation.y) / fps;
+			}
+		}
+		if (Key.isDown(Key.A)) {
+			if (testCol(camera.position.x - 2 * (Math.sin(camera.rotation.y + Math.PI/2) / fps), camera.position.y, camera.position.z - 2 * (Math.cos(camera.rotation.y + Math.PI/2) / fps)) && testCol(camera.position.x - 2 * (Math.sin(camera.rotation.y + Math.PI/2) / fps), camera.position.y, camera.position.z - 2 * (Math.cos(camera.rotation.y + Math.PI/2) / fps))) {
+				camera.position.x -= 2 * Math.sin(camera.rotation.y + Math.PI/2) / fps;
+				camera.position.z -= 2 * Math.cos(camera.rotation.y + Math.PI/2) / fps;
+			}
+		}
+		if (Key.isDown(Key.S)) {
+			if (testCol(camera.position.x + 2 * (Math.sin(camera.rotation.y) / fps), camera.position.y, camera.position.z + 2 * (Math.cos(camera.rotation.y) / fps)) && testCol(camera.position.x + 2 * (Math.sin(camera.rotation.y) / fps), camera.position.y, camera.position.z + 2 * (Math.cos(camera.rotation.y) / fps))) {
+				camera.position.x += 2 * Math.sin(camera.rotation.y) / fps;
+				camera.position.z += 2 * Math.cos(camera.rotation.y) / fps;
+			}
+		}
+		if (Key.isDown(Key.D)) {
+			if (testCol(camera.position.x - 2 * (Math.sin(camera.rotation.y - Math.PI/2) / fps), camera.position.y-1.75, camera.position.z - 2 * (Math.cos(camera.rotation.y - Math.PI/2) / fps)) && testCol(camera.position.x - 2 * (Math.sin(camera.rotation.y - Math.PI/2) / fps), camera.position.y, camera.position.z - 2 * (Math.cos(camera.rotation.y - Math.PI/2) / fps))) {
+				camera.position.x -= 2 * Math.sin(camera.rotation.y - Math.PI/2) / fps;
+				camera.position.z -= 2 * Math.cos(camera.rotation.y - Math.PI/2) / fps;
+			}
+		}
+		if (Key.isDown(Key.SPACE)) {
+			if (testCol(camera.position.x, (camera.position.y + 2 / fps), camera.position.z)) {
+				camera.position.y += 2 / fps;
+			}
+		}
+		if (Key.isDown(Key.SHIFT)) {
+			if (testCol(camera.position.x, (camera.position.y - 2 / fps), camera.position.z)) {
+				camera.position.y -= 2 / fps;
+			}
+		}
+		if (Key.isDown(Key.T)) {
+			inChat = true;
+			document.getElementById('m').hidden = false;
+			document.getElementById('m').focus();
 		}
 	}
-	if (Key.isDown(Key.A)) {
-		if (testCol(camera.position.x - 2 * (Math.sin(camera.rotation.y + Math.PI/2) / fps), camera.position.y, camera.position.z - 2 * (Math.cos(camera.rotation.y + Math.PI/2) / fps)) && testCol(camera.position.x - 2 * (Math.sin(camera.rotation.y + Math.PI/2) / fps), camera.position.y, camera.position.z - 2 * (Math.cos(camera.rotation.y + Math.PI/2) / fps))) {
-			camera.position.x -= 2 * Math.sin(camera.rotation.y + Math.PI/2) / fps;
-			camera.position.z -= 2 * Math.cos(camera.rotation.y + Math.PI/2) / fps;
-		}
-	}
-	if (Key.isDown(Key.S)) {
-		if (testCol(camera.position.x + 2 * (Math.sin(camera.rotation.y) / fps), camera.position.y, camera.position.z + 2 * (Math.cos(camera.rotation.y) / fps)) && testCol(camera.position.x + 2 * (Math.sin(camera.rotation.y) / fps), camera.position.y, camera.position.z + 2 * (Math.cos(camera.rotation.y) / fps))) {
-			camera.position.x += 2 * Math.sin(camera.rotation.y) / fps;
-			camera.position.z += 2 * Math.cos(camera.rotation.y) / fps;
-		}
-	}
-	if (Key.isDown(Key.D)) {
-		if (testCol(camera.position.x - 2 * (Math.sin(camera.rotation.y - Math.PI/2) / fps), camera.position.y-1.75, camera.position.z - 2 * (Math.cos(camera.rotation.y - Math.PI/2) / fps)) && testCol(camera.position.x - 2 * (Math.sin(camera.rotation.y - Math.PI/2) / fps), camera.position.y, camera.position.z - 2 * (Math.cos(camera.rotation.y - Math.PI/2) / fps))) {
-			camera.position.x -= 2 * Math.sin(camera.rotation.y - Math.PI/2) / fps;
-			camera.position.z -= 2 * Math.cos(camera.rotation.y - Math.PI/2) / fps;
-		}
-	}
-	if (Key.isDown(Key.SPACE)) {
-		if (testCol(camera.position.x, (camera.position.y + 2 / fps), camera.position.z)) {
-			camera.position.y += 2 / fps;
-		}
-	}
-	if (Key.isDown(Key.SHIFT)) {
-		if (testCol(camera.position.x, (camera.position.y - 2 / fps), camera.position.z)) {
-			camera.position.y -= 2 / fps;
+	if (inChat) {
+		if (Key.isDown(Key.ENTER)) {
+			inChat = false;
+			socket.emit('chat', myId + ': ' + document.getElementById('m').value);
+			document.getElementById('m').hidden = true;
+			document.getElementById('m').value = '';
 		}
 	}
 	socket.emit('playerLoop', {x:camera.position.x, y:camera.position.y, z:camera.position.z, rotx:camera.rotation.x, roty:camera.rotation.y, rotz:camera.rotation.z, id:myId});

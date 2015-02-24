@@ -5,10 +5,13 @@
 		<link href='css/stylesheet.css' rel='stylesheet' type='text/css'>
 		<title>Socket.io & Three.js</title>
 		<script>
+			var inChat = false;
 			window.onkeydown=function(e){
-  				if(e.keyCode==32) {
-   					return false;
-  				}
+				if (!inChat) {
+					if(e.keyCode==32) {
+						return false;
+					}
+				}
   				if(e.keyCode==40) {
    					return false;
   				}
@@ -19,6 +22,8 @@
 		</script>
 	</head>
 	<body>
+		<input type='text' id='m' hidden>
+		<ul id='messages'></ul>
 		<script src="/socket.io/socket.io.js"></script>
 		<script src='js/three.min.js'></script>
 		<script src='js/main.js'></script>
