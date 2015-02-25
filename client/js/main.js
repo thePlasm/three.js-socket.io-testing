@@ -14,6 +14,8 @@ var lastLoop = new Date;
 var fps;
 var thisLoop;
 var sensitivity = 0.005;
+var mouseDX = 0;
+var mouseDY = 0;
 
 var mode = 'create';
 var bulletModes = [];
@@ -56,6 +58,7 @@ socket.on('youJoin', function(obj){
 socket.on('playerJoin', function(id){
 	if (id != myId) {
 		console.log("A player connected with id:" + id);
+		document.getElementById('messages').innerHTML += '<li>' + 'A user connected with id:' + id + '</li>';
 		players.push({
 			id: id,
 		});
@@ -80,6 +83,7 @@ socket.on('playerPos', function(obj){
 });
 socket.on('playerLeave', function (id){
 	console.log("A player disconnected with id:" + id);
+	document.getElementById('messages').innerHTML += '<li>' + 'A user disconnected with id:' + id + '</li>';
 	for (j = 0; j<players.length; j++) {
 		if (players[j].id == id) {
 			scene.remove(playerMeshes[j]);
@@ -263,7 +267,7 @@ _pressed: {},
 	T: 84,
     
     isDown: function(keyCode) {
-return this._pressed[keyCode];
+		return this._pressed[keyCode];
     },
   
     onKeydown: function(keyevent) {
@@ -277,8 +281,8 @@ return this._pressed[keyCode];
 
 var onMouseMove = function ( event ) {
 
-	var mouseDX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
-	var mouseDY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
+	mouseDX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
+	mouseDY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
 
 	camera.rotation.y -= mouseDX * sensitivity;
 	camera.rotation.x -= mouseDY * sensitivity;
@@ -465,7 +469,7 @@ var render = function () {
 			}
 		}
 		if (Key.isDown(Key.D)) {
-			if (testCol(camera.position.x - 2 * (Math.sin(camera.rotation.y - Math.PI/2) / fps), camera.position.y-1.75, camera.position.z - 2 * (Math.cos(camera.rotation.y - Math.PI/2) / fps)) && testCol(camera.position.x - 2 * (Math.sin(camera.rotation.y - Math.PI/2) / fps), camera.position.y, camera.position.z - 2 * (Math.cos(camera.rotation.y - Math.PI/2) / fps))) {
+			if (testCol(camera.position.x - 2 * (Math.sin(camera.rotation.y - Math.PI/2) / fps), camera.position.y, camera.position.z - 2 * (Math.cos(camera.rotation.y - Math.PI/2) / fps)) && testCol(camera.position.x - 2 * (Math.sin(camera.rotation.y - Math.PI/2) / fps), camera.position.y, camera.position.z - 2 * (Math.cos(camera.rotation.y - Math.PI/2) / fps))) {
 				camera.position.x -= 2 * Math.sin(camera.rotation.y - Math.PI/2) / fps;
 				camera.position.z -= 2 * Math.cos(camera.rotation.y - Math.PI/2) / fps;
 			}
