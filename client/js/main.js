@@ -24,6 +24,7 @@ var playerMeshes = [];
 var voxels = [];
 var voxelMeshes = [];
 var voxelSounds = [];
+var paintSounds = [];
 socket.on('youJoin', function(obj){
 	camera.position.set(obj.x, obj.y, obj.z);
 	camera.rotation.set(obj.rotx, obj.roty, obj.rotz);
@@ -44,9 +45,11 @@ socket.on('youJoin', function(obj){
 		voxelMeshes[voxelMeshes.length-1].position.set(voxels[d].x, voxels[d].y, voxels[d].z);
 		voxelMeshes[voxelMeshes.length-1].rotation.set(voxels[d].rotx, voxels[d].roty, voxels[d].rotz);
 		voxelSounds.push(new THREE.Audio(listener));
-		voxelSounds[voxelSounds.length-1].load('media/Frozen Star.mp3');
-		voxelSounds[voxelSounds.length-1].setRefDistance(20);
+		paintSounds.push(new THREE.Audio(listener));
+		voxelSounds[voxelSounds.length-1].load('media/woosh.mp3');
+		voxelSounds[voxelSounds.length-1].setRefDistance(1);
 		voxelMeshes[voxelMeshes.length-1].add(voxelSounds[voxelSounds.length-1]);
+		voxelMeshes[voxelMeshes.length-1].add(paintSounds[voxelSounds.length-1]);
 		scene.add(voxelMeshes[voxelMeshes.length-1]);
 	}
 });
@@ -91,9 +94,11 @@ socket.on('blockcreate', function(obj){
 	voxelMeshes[voxelMeshes.length-1].position.set(obj.x, obj.y, obj.z);
 	voxelMeshes[voxelMeshes.length-1].rotation.set(obj.rotx, obj.roty, obj.rotz);
 	voxelSounds.push(new THREE.Audio(listener));
-	voxelSounds[voxelSounds.length-1].load('media/Frozen Star.mp3');
-	voxelSounds[voxelSounds.length-1].setRefDistance(20);
+	paintSounds.push(new THREE.Audio(listener));
+	voxelSounds[voxelSounds.length-1].load('media/woosh.mp3');
+	voxelSounds[voxelSounds.length-1].setRefDistance(1);
 	voxelMeshes[voxelMeshes.length-1].add(voxelSounds[voxelSounds.length-1]);
+	voxelMeshes[voxelMeshes.length-1].add(paintSounds[voxelSounds.length-1]);
 	scene.add(voxelMeshes[voxelMeshes.length-1]);
 });
 socket.on('blockdestroy', function(obj){
@@ -101,7 +106,9 @@ socket.on('blockdestroy', function(obj){
 		if (voxels[e].id == obj) {
 			scene.remove(voxelMeshes[e]);
 			voxelMeshes[e].remove(voxelSounds[e]);
+			voxelMeshes[e].remove(paintSounds[e]);
 			voxelSounds.splice(e, 1);
+			paintSounds.splice(e, 1);
 			voxels.splice(e, 1);
 			voxelMeshes.splice(e, 1);
 		}
@@ -111,6 +118,8 @@ socket.on('blockred', function(obj){
 	for (f = 0; f < voxels.length; f++) {
 		if (voxels[f].id == obj) {
 			voxelMeshes[f].material = new THREE.MeshBasicMaterial({color: 0xff0000});
+			paintSounds[f].load('media/water.mp3');
+			paintSounds[f].setRefDistance(1);
 		}
 	}
 });
@@ -118,6 +127,8 @@ socket.on('blockgreen', function(obj){
 	for (g = 0; g < voxels.length; g++) {
 		if (voxels[g].id == obj) {
 			voxelMeshes[g].material = new THREE.MeshBasicMaterial({color: 0x00ff00});
+			paintSounds[g].load('media/water.mp3');
+			paintSounds[g].setRefDistance(1);
 		}
 	}
 });
@@ -125,6 +136,8 @@ socket.on('blockblue', function(obj){
 	for (h = 0; h < voxels.length; h++) {
 		if (voxels[h].id == obj) {
 			voxelMeshes[h].material = new THREE.MeshBasicMaterial({color: 0x0000ff});
+			paintSounds[h].load('media/water.mp3');
+			paintSounds[h].setRefDistance(1);
 		}
 	}
 });
@@ -132,6 +145,8 @@ socket.on('blockwhite', function(obj){
 	for (i = 0; i < voxels.length; i++) {
 		if (voxels[i].id == obj) {
 			voxelMeshes[i].material = new THREE.MeshBasicMaterial({color: 0xffffff});
+			paintSounds[i].load('media/water.mp3');
+			paintSounds[i].setRefDistance(1);
 		}
 	}
 });
@@ -139,6 +154,8 @@ socket.on('blockblack', function(obj){
 	for (j = 0; j < voxels.length; j++) {
 		if (voxels[j].id == obj) {
 			voxelMeshes[j].material = new THREE.MeshBasicMaterial({color: 0x000000});
+			paintSounds[j].load('media/water.mp3');
+			paintSounds[j].setRefDistance(1);
 		}
 	}
 });
@@ -322,7 +339,9 @@ var render = function () {
 				voxcolbulltempnum = findCol(bullets[counter].position.x - (5 * Math.sin(bullets[counter].rotation.y))/fps, bullets[counter].position.y + (5 * Math.tan(bullets[counter].rotation.x))/fps, bullets[counter].position.z - (5 * Math.cos(bullets[counter].rotation.y))/fps);
 				scene.remove(voxelMeshes[voxcolbulltempnum]);
 				voxelMeshes[voxcolbulltempnum].remove(voxelSounds[voxcolbulltempnum]);
+				voxelMeshes[voxcolbulltempnum].remove(paintSounds[voxcolbulltempnum]);
 				voxelSounds.splice(voxcolbulltempnum, 1);
+				paintSounds.splice(voxcolbulltempnum, 1);
 				voxelMeshes.splice(voxcolbulltempnum, 1);
 				socket.emit('blockdestroy', voxels[voxcolbulltempnum].id);
 				voxels.splice(voxcolbulltempnum, 1);
@@ -335,9 +354,11 @@ var render = function () {
 				voxelMeshes.push(new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial( {color: 0xffffff} )));
 				voxels.push({x: Math.round(bullets[counter].position.x), y: Math.round(bullets[counter].position.y), z: Math.round(bullets[counter].position.z), rotx: 0, roty: 0, rotz: 0, id: voxels.length, colour: 0xffffff});
 				voxelSounds.push(new THREE.Audio(listener));
-				voxelSounds[voxelSounds.length-1].load('media/Frozen Star.mp3');
-				voxelSounds[voxelSounds.length-1].setRefDistance(20);
+				paintSounds.push(new THREE.Audio(listener));
+				voxelSounds[voxelSounds.length-1].load('media/woosh.mp3');
+				voxelSounds[voxelSounds.length-1].setRefDistance(1);
 				voxelMeshes[voxelMeshes.length-1].add(voxelSounds[voxelSounds.length-1]);
+				voxelMeshes[voxelMeshes.length-1].add(paintSounds[voxelSounds.length-1]);
 				scene.add(voxelMeshes[voxels.length-1]);
 				voxelMeshes[voxels.length-1].position.set(Math.round(bullets[counter].position.x), Math.round(bullets[counter].position.y), Math.round(bullets[counter].position.z));
 				scene.remove(bullets[counter]);
@@ -350,6 +371,8 @@ var render = function () {
 				voxcolbulltempnum = findCol(bullets[counter].position.x - (5 * Math.sin(bullets[counter].rotation.y))/fps, bullets[counter].position.y + (5 * Math.tan(bullets[counter].rotation.x))/fps, bullets[counter].position.z - (5 * Math.cos(bullets[counter].rotation.y))/fps);
 				socket.emit('blockred', voxels[voxcolbulltempnum].id);
 				voxelMeshes[voxcolbulltempnum].material = new THREE.MeshBasicMaterial({color: 0xff0000});
+				paintSounds[voxcolbulltempnum].load('media/water.mp3');
+				paintSounds[voxcolbulltempnum].setRefDistance(1);
 				scene.remove(bullets[counter]);
 				bullets.splice(counter, 1);
 				bulletModes.splice(counter, 1);
@@ -359,6 +382,8 @@ var render = function () {
 				voxcolbulltempnum = findCol(bullets[counter].position.x - (5 * Math.sin(bullets[counter].rotation.y))/fps, bullets[counter].position.y + (5 * Math.tan(bullets[counter].rotation.x))/fps, bullets[counter].position.z - (5 * Math.cos(bullets[counter].rotation.y))/fps);
 				socket.emit('blockgreen', voxels[voxcolbulltempnum].id);
 				voxelMeshes[voxcolbulltempnum].material = new THREE.MeshBasicMaterial({color: 0x00ff00});
+				paintSounds[voxcolbulltempnum].load('media/water.mp3');
+				paintSounds[voxcolbulltempnum].setRefDistance(1);
 				scene.remove(bullets[counter]);
 				bullets.splice(counter, 1);
 				bulletModes.splice(counter, 1);
@@ -368,6 +393,8 @@ var render = function () {
 				voxcolbulltempnum = findCol(bullets[counter].position.x - (5 * Math.sin(bullets[counter].rotation.y))/fps, bullets[counter].position.y + (5 * Math.tan(bullets[counter].rotation.x))/fps, bullets[counter].position.z - (5 * Math.cos(bullets[counter].rotation.y))/fps);
 				socket.emit('blockblue', voxels[voxcolbulltempnum].id);
 				voxelMeshes[voxcolbulltempnum].material = new THREE.MeshBasicMaterial({color: 0x0000ff});
+				paintSounds[voxcolbulltempnum].load('media/water.mp3');
+				paintSounds[voxcolbulltempnum].setRefDistance(1);
 				scene.remove(bullets[counter]);
 				bullets.splice(counter, 1);
 				bulletModes.splice(counter, 1);
@@ -377,6 +404,8 @@ var render = function () {
 				voxcolbulltempnum = findCol(bullets[counter].position.x - (5 * Math.sin(bullets[counter].rotation.y))/fps, bullets[counter].position.y + (5 * Math.tan(bullets[counter].rotation.x))/fps, bullets[counter].position.z - (5 * Math.cos(bullets[counter].rotation.y))/fps);
 				socket.emit('blockwhite', voxels[voxcolbulltempnum].id);
 				voxelMeshes[voxcolbulltempnum].material = new THREE.MeshBasicMaterial({color: 0xffffff});
+				paintSounds[voxcolbulltempnum].load('media/water.mp3');
+				paintSounds[voxcolbulltempnum].setRefDistance(1);
 				scene.remove(bullets[counter]);
 				bullets.splice(counter, 1);
 				bulletModes.splice(counter, 1);
@@ -386,6 +415,8 @@ var render = function () {
 				voxcolbulltempnum = findCol(bullets[counter].position.x - (5 * Math.sin(bullets[counter].rotation.y))/fps, bullets[counter].position.y + (5 * Math.tan(bullets[counter].rotation.x))/fps, bullets[counter].position.z - (5 * Math.cos(bullets[counter].rotation.y))/fps);
 				socket.emit('blockblack', voxels[voxcolbulltempnum].id);
 				voxelMeshes[voxcolbulltempnum].material = new THREE.MeshBasicMaterial({color: 0x000000});
+				paintSounds[voxcolbulltempnum].load('media/water.mp3');
+				paintSounds[voxcolbulltempnum].setRefDistance(1);
 				scene.remove(bullets[counter]);
 				bullets.splice(counter, 1);
 				bulletModes.splice(counter, 1);
