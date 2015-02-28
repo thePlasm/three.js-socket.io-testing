@@ -29,5 +29,21 @@ canvas {
 	background-color: rgba(0, 0, 0, 0.5);
 	color: #fff;
 	word-wrap: break-word;
+	white-space: pre-wrap;
+	white-space: -moz-pre-wrap;
+    white-space: -webkit-pre-wrap;
+	white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
 	text-align: left;
+}
+#inmessages {
+	margin: 0px;
+	padding: 0px;
+	width: 100%;
+	word-wrap: break-word;
+	white-space: pre-wrap;
+	white-space: -moz-pre-wrap;
+    white-space: -webkit-pre-wrap;
+	white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
 }

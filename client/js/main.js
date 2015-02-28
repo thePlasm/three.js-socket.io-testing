@@ -48,8 +48,6 @@ socket.on('youJoin', function(obj){
 		voxelMeshes[voxelMeshes.length-1].rotation.set(voxels[d].rotx, voxels[d].roty, voxels[d].rotz);
 		voxelSounds.push(new THREE.Audio(listener));
 		paintSounds.push(new THREE.Audio(listener));
-		voxelSounds[voxelSounds.length-1].load('media/woosh.mp3');
-		voxelSounds[voxelSounds.length-1].setRefDistance(1);
 		voxelMeshes[voxelMeshes.length-1].add(voxelSounds[voxelSounds.length-1]);
 		voxelMeshes[voxelMeshes.length-1].add(paintSounds[voxelSounds.length-1]);
 		scene.add(voxelMeshes[voxelMeshes.length-1]);
@@ -58,7 +56,7 @@ socket.on('youJoin', function(obj){
 socket.on('playerJoin', function(id){
 	if (id != myId) {
 		console.log("A player connected with id:" + id);
-		document.getElementById('messages').innerHTML += '<li>' + 'A user connected with id:' + id + '</li>';
+		document.getElementById('messages').innerHTML += '<li id=\'inmessages\'><pre id=\'inmessages\'>' + 'A user connected with id:' + id + '</pre></li>';
 		players.push({
 			id: id,
 		});
@@ -67,7 +65,7 @@ socket.on('playerJoin', function(id){
 	}
 });
 socket.on('chat', function(msg){
-	document.getElementById('messages').innerHTML += '<li>' + msg + '</li>';
+	document.getElementById('messages').innerHTML += '<li id=\'inmessages\'><pre id=\'inmessages\'>' + msg + '</pre></li>';
 });
 socket.on('playerPos', function(obj){
 	for (i = 0; i<players.length; i++) {
@@ -83,7 +81,7 @@ socket.on('playerPos', function(obj){
 });
 socket.on('playerLeave', function (id){
 	console.log("A player disconnected with id:" + id);
-	document.getElementById('messages').innerHTML += '<li>' + 'A user disconnected with id:' + id + '</li>';
+	document.getElementById('messages').innerHTML += '<li id=\'inmessages\'><pre id=\'inmessages\'>' + 'A user disconnected with id:' + id + '</pre></li>';
 	for (j = 0; j<players.length; j++) {
 		if (players[j].id == id) {
 			scene.remove(playerMeshes[j]);
@@ -122,8 +120,18 @@ socket.on('blockred', function(obj){
 	for (f = 0; f < voxels.length; f++) {
 		if (voxels[f].id == obj) {
 			voxelMeshes[f].material = new THREE.MeshBasicMaterial({color: 0xff0000});
-			paintSounds[f].load('media/water.mp3');
-			paintSounds[f].setRefDistance(1);
+			if (paintSounds[f] !== undefined) {
+				paintSounds[f].load('media/water.mp3');
+				paintSounds[f].setRefDistance(1);
+				voxelMeshes[f].remove(paintSounds[f]);
+				paintSounds.splice(f, 1);
+				paintSounds[f] = new THREE.Audio(listener);
+				voxelMeshes[f].add(paintSounds[f]);
+			}
+			if (paintSounds[f] === undefined) {
+				paintSounds[f] = new THREE.Audio(listener);
+				voxelMeshes[f].add(paintSounds[f]);
+			}
 		}
 	}
 });
@@ -131,8 +139,18 @@ socket.on('blockgreen', function(obj){
 	for (g = 0; g < voxels.length; g++) {
 		if (voxels[g].id == obj) {
 			voxelMeshes[g].material = new THREE.MeshBasicMaterial({color: 0x00ff00});
-			paintSounds[g].load('media/water.mp3');
-			paintSounds[g].setRefDistance(1);
+			if (paintSounds[g] !== undefined) {
+				paintSounds[g].load('media/water.mp3');
+				paintSounds[g].setRefDistance(1);
+				voxelMeshes[g].remove(paintSounds[g]);
+				paintSounds.splice(g, 1);
+				paintSounds[g] = new THREE.Audio(listener);
+				voxelMeshes[g].add(paintSounds[g]);
+			}
+			if (paintSounds[g] === undefined) {
+				paintSounds[g] = new THREE.Audio(listener);
+				voxelMeshes[g].add(paintSounds[g]);
+			}
 		}
 	}
 });
@@ -140,8 +158,18 @@ socket.on('blockblue', function(obj){
 	for (h = 0; h < voxels.length; h++) {
 		if (voxels[h].id == obj) {
 			voxelMeshes[h].material = new THREE.MeshBasicMaterial({color: 0x0000ff});
-			paintSounds[h].load('media/water.mp3');
-			paintSounds[h].setRefDistance(1);
+			if (paintSounds[h] !== undefined) {
+				paintSounds[h].load('media/water.mp3');
+				paintSounds[h].setRefDistance(1);
+				voxelMeshes[h].remove(paintSounds[h]);
+				paintSounds.splice(h, 1);
+				paintSounds[h] = new THREE.Audio(listener);
+				voxelMeshes[h].add(paintSounds[h]);
+			}
+			if (paintSounds[h] === undefined) {
+				paintSounds[h] = new THREE.Audio(listener);
+				voxelMeshes[h].add(paintSounds[h]);
+			}
 		}
 	}
 });
@@ -149,8 +177,18 @@ socket.on('blockwhite', function(obj){
 	for (i = 0; i < voxels.length; i++) {
 		if (voxels[i].id == obj) {
 			voxelMeshes[i].material = new THREE.MeshBasicMaterial({color: 0xffffff});
-			paintSounds[i].load('media/water.mp3');
-			paintSounds[i].setRefDistance(1);
+			if (paintSounds[i] !== undefined) {
+				paintSounds[i].load('media/water.mp3');
+				paintSounds[i].setRefDistance(1);
+				voxelMeshes[i].remove(paintSounds[i]);
+				paintSounds.splice(i, 1);
+				paintSounds[i] = new THREE.Audio(listener);
+				voxelMeshes[i].add(paintSounds[i]);
+			}
+			if (paintSounds[i] === undefined) {
+				paintSounds[i] = new THREE.Audio(listener);
+				voxelMeshes[i].add(paintSounds[i]);
+			}
 		}
 	}
 });
@@ -158,8 +196,18 @@ socket.on('blockblack', function(obj){
 	for (j = 0; j < voxels.length; j++) {
 		if (voxels[j].id == obj) {
 			voxelMeshes[j].material = new THREE.MeshBasicMaterial({color: 0x000000});
-			paintSounds[j].load('media/water.mp3');
-			paintSounds[j].setRefDistance(1);
+			if (paintSounds[j] !== undefined) {
+				paintSounds[j].load('media/water.mp3');
+				paintSounds[j].setRefDistance(1);
+				voxelMeshes[j].remove(paintSounds[j]);
+				paintSounds.splice(j, 1);
+				paintSounds[j] = new THREE.Audio(listener);
+				voxelMeshes[j].add(paintSounds[j]);
+			}
+			if (paintSounds[j] === undefined) {
+				paintSounds[j] = new THREE.Audio(listener);
+				voxelMeshes[j].add(paintSounds[j]);
+			}
 		}
 	}
 });
@@ -375,8 +423,18 @@ var render = function () {
 				voxcolbulltempnum = findCol(bullets[counter].position.x - (5 * Math.sin(bullets[counter].rotation.y))/fps, bullets[counter].position.y + (5 * Math.tan(bullets[counter].rotation.x))/fps, bullets[counter].position.z - (5 * Math.cos(bullets[counter].rotation.y))/fps);
 				socket.emit('blockred', voxels[voxcolbulltempnum].id);
 				voxelMeshes[voxcolbulltempnum].material = new THREE.MeshBasicMaterial({color: 0xff0000});
-				paintSounds[voxcolbulltempnum].load('media/water.mp3');
-				paintSounds[voxcolbulltempnum].setRefDistance(1);
+				if (paintSounds[voxcolbulltempnum] !== undefined) {
+					paintSounds[voxcolbulltempnum].load('media/water.mp3');
+					paintSounds[voxcolbulltempnum].setRefDistance(1);
+					voxelMeshes[voxcolbulltempnum].remove(paintSounds[voxcolbulltempnum]);
+					paintSounds.splice(voxcolbulltempnum, 1);
+					paintSounds[voxcolbulltempnum] = new THREE.Audio(listener);
+					voxelMeshes[voxcolbulltempnum].add(paintSounds[voxcolbulltempnum]);
+				}
+				if (paintSounds[voxcolbulltempnum] === undefined) {
+					paintSounds[voxcolbulltempnum] = new THREE.Audio(listener);
+					voxelMeshes[voxcolbulltempnum].add(paintSounds[voxcolbulltempnum]);
+				}
 				scene.remove(bullets[counter]);
 				bullets.splice(counter, 1);
 				bulletModes.splice(counter, 1);
@@ -386,8 +444,18 @@ var render = function () {
 				voxcolbulltempnum = findCol(bullets[counter].position.x - (5 * Math.sin(bullets[counter].rotation.y))/fps, bullets[counter].position.y + (5 * Math.tan(bullets[counter].rotation.x))/fps, bullets[counter].position.z - (5 * Math.cos(bullets[counter].rotation.y))/fps);
 				socket.emit('blockgreen', voxels[voxcolbulltempnum].id);
 				voxelMeshes[voxcolbulltempnum].material = new THREE.MeshBasicMaterial({color: 0x00ff00});
-				paintSounds[voxcolbulltempnum].load('media/water.mp3');
-				paintSounds[voxcolbulltempnum].setRefDistance(1);
+				if (paintSounds[voxcolbulltempnum] !== undefined) {
+					paintSounds[voxcolbulltempnum].load('media/water.mp3');
+					paintSounds[voxcolbulltempnum].setRefDistance(1);
+					voxelMeshes[voxcolbulltempnum].remove(paintSounds[voxcolbulltempnum]);
+					paintSounds.splice(voxcolbulltempnum, 1);
+					paintSounds[voxcolbulltempnum] = new THREE.Audio(listener);
+					voxelMeshes[voxcolbulltempnum].add(paintSounds[voxcolbulltempnum]);
+				}
+				if (paintSounds[voxcolbulltempnum] === undefined) {
+					paintSounds[voxcolbulltempnum] = new THREE.Audio(listener);
+					voxelMeshes[voxcolbulltempnum].add(paintSounds[voxcolbulltempnum]);
+				}
 				scene.remove(bullets[counter]);
 				bullets.splice(counter, 1);
 				bulletModes.splice(counter, 1);
@@ -397,8 +465,18 @@ var render = function () {
 				voxcolbulltempnum = findCol(bullets[counter].position.x - (5 * Math.sin(bullets[counter].rotation.y))/fps, bullets[counter].position.y + (5 * Math.tan(bullets[counter].rotation.x))/fps, bullets[counter].position.z - (5 * Math.cos(bullets[counter].rotation.y))/fps);
 				socket.emit('blockblue', voxels[voxcolbulltempnum].id);
 				voxelMeshes[voxcolbulltempnum].material = new THREE.MeshBasicMaterial({color: 0x0000ff});
-				paintSounds[voxcolbulltempnum].load('media/water.mp3');
-				paintSounds[voxcolbulltempnum].setRefDistance(1);
+				if (paintSounds[voxcolbulltempnum] !== undefined) {
+					paintSounds[voxcolbulltempnum].load('media/water.mp3');
+					paintSounds[voxcolbulltempnum].setRefDistance(1);
+					voxelMeshes[voxcolbulltempnum].remove(paintSounds[voxcolbulltempnum]);
+					paintSounds.splice(voxcolbulltempnum, 1);
+					paintSounds[voxcolbulltempnum] = new THREE.Audio(listener);
+					voxelMeshes[voxcolbulltempnum].add(paintSounds[voxcolbulltempnum]);
+				}
+				if (paintSounds[voxcolbulltempnum] === undefined) {
+					paintSounds[voxcolbulltempnum] = new THREE.Audio(listener);
+					voxelMeshes[voxcolbulltempnum].add(paintSounds[voxcolbulltempnum]);
+				}
 				scene.remove(bullets[counter]);
 				bullets.splice(counter, 1);
 				bulletModes.splice(counter, 1);
@@ -408,8 +486,18 @@ var render = function () {
 				voxcolbulltempnum = findCol(bullets[counter].position.x - (5 * Math.sin(bullets[counter].rotation.y))/fps, bullets[counter].position.y + (5 * Math.tan(bullets[counter].rotation.x))/fps, bullets[counter].position.z - (5 * Math.cos(bullets[counter].rotation.y))/fps);
 				socket.emit('blockwhite', voxels[voxcolbulltempnum].id);
 				voxelMeshes[voxcolbulltempnum].material = new THREE.MeshBasicMaterial({color: 0xffffff});
-				paintSounds[voxcolbulltempnum].load('media/water.mp3');
-				paintSounds[voxcolbulltempnum].setRefDistance(1);
+				if (paintSounds[voxcolbulltempnum] !== undefined) {
+					paintSounds[voxcolbulltempnum].load('media/water.mp3');
+					paintSounds[voxcolbulltempnum].setRefDistance(1);
+					voxelMeshes[voxcolbulltempnum].remove(paintSounds[voxcolbulltempnum]);
+					paintSounds.splice(voxcolbulltempnum, 1);
+					paintSounds[voxcolbulltempnum] = new THREE.Audio(listener);
+					voxelMeshes[voxcolbulltempnum].add(paintSounds[voxcolbulltempnum]);
+				}
+				if (paintSounds[voxcolbulltempnum] === undefined) {
+					paintSounds[voxcolbulltempnum] = new THREE.Audio(listener);
+					voxelMeshes[voxcolbulltempnum].add(paintSounds[voxcolbulltempnum]);
+				}
 				scene.remove(bullets[counter]);
 				bullets.splice(counter, 1);
 				bulletModes.splice(counter, 1);
@@ -419,8 +507,18 @@ var render = function () {
 				voxcolbulltempnum = findCol(bullets[counter].position.x - (5 * Math.sin(bullets[counter].rotation.y))/fps, bullets[counter].position.y + (5 * Math.tan(bullets[counter].rotation.x))/fps, bullets[counter].position.z - (5 * Math.cos(bullets[counter].rotation.y))/fps);
 				socket.emit('blockblack', voxels[voxcolbulltempnum].id);
 				voxelMeshes[voxcolbulltempnum].material = new THREE.MeshBasicMaterial({color: 0x000000});
-				paintSounds[voxcolbulltempnum].load('media/water.mp3');
-				paintSounds[voxcolbulltempnum].setRefDistance(1);
+				if (paintSounds[voxcolbulltempnum] !== undefined) {
+					paintSounds[voxcolbulltempnum].load('media/water.mp3');
+					paintSounds[voxcolbulltempnum].setRefDistance(1);
+					voxelMeshes[voxcolbulltempnum].remove(paintSounds[voxcolbulltempnum]);
+					paintSounds.splice(voxcolbulltempnum, 1);
+					paintSounds[voxcolbulltempnum] = new THREE.Audio(listener);
+					voxelMeshes[voxcolbulltempnum].add(paintSounds[voxcolbulltempnum]);
+				}
+				if (paintSounds[voxcolbulltempnum] === undefined) {
+					paintSounds[voxcolbulltempnum] = new THREE.Audio(listener);
+					voxelMeshes[voxcolbulltempnum].add(paintSounds[voxcolbulltempnum]);
+				}
 				scene.remove(bullets[counter]);
 				bullets.splice(counter, 1);
 				bulletModes.splice(counter, 1);
