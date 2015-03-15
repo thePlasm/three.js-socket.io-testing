@@ -305,23 +305,23 @@ _pressed: {},
 	FIVE: 53,
 	SIX: 54,
 	SEVEN: 55,
-   	A: 65,
+  A: 65,
 	W: 87,
-    D: 68,
-    S: 83,
-    SPACE: 32,
-    SHIFT: 16,
+	D: 68,
+  S: 83,
+  SPACE: 32,
+  SHIFT: 16,
 	ENTER: 13,
 	T: 84,
-    
+
     isDown: function(keyCode) {
 		return this._pressed[keyCode];
     },
-  
+
     onKeydown: function(keyevent) {
       this._pressed[keyevent.keyCode] = true;
     },
-  
+
     onKeyup: function(keyevent) {
       delete this._pressed[keyevent.keyCode];
     }
@@ -332,9 +332,9 @@ var onMouseMove = function ( event ) {
 	mouseDX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
 	mouseDY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
 
-	camera.rotation.y -= mouseDX * sensitivity;
-	camera.rotation.x -= mouseDY * sensitivity;
-	
+	camera.rotation.y -= parseFloat(mouseDX.toString())*parseFloat(sensitivity.toString());
+	camera.rotation.x -= parseFloat(mouseDY.toString())*parseFloat(sensitivity.toString());
+
 	if (camera.rotation.x < (-Math.PI/2)) {
 		camera.rotation.x = (-Math.PI/2);
 	}
@@ -367,7 +367,7 @@ function lockChangeAlert() {
     window.addEventListener('keyup', function(event) { Key.onKeyup(event); }, false);
 	window.addEventListener('keydown', function(event) { Key.onKeydown(event); }, false);
   } else {
-    console.log('The pointer lock status is now unlocked');  
+    console.log('The pointer lock status is now unlocked');
     canvas.removeEventListener( 'mousemove', onMouseMove, false );
 	canvas.removeEventListener( 'click', clickInteract, false );
     window.removeEventListener('keyup', function(event) { Key.onKeyup(event); }, false);

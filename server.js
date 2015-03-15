@@ -4,6 +4,7 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var stdin = process.openStdin();
 var fs = require('fs');
+
 var map = {};
 var id = 0;
 var index = 0;
@@ -118,5 +119,5 @@ io.on('connection', function(socket){
 
 http.listen(+process.argv[2], function(){
 	console.log('listening on *:' + process.argv[2].toString());
-	
+
 });
